@@ -1,0 +1,5 @@
+VERSION 1.0.1
+    - created basic scripts
+    - error handling for many scripts
+    - working graph function
+    - introducing compare_predictions.py

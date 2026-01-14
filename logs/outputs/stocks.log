@@ -1,6 +1,0 @@
-2026-01-14 12:38:21,307 | INFO | [tests.py -> test_logging():13]		This is an info message.
-2026-01-14 12:38:21,307 | WARNING | [tests.py -> test_logging():14]		This is a warning message.
-2026-01-14 12:38:21,307 | ERROR | [tests.py -> test_logging():15]		This is an error message.
-2026-01-14 12:40:00,783 | INFO | [tests.py -> test_logging():13]		This is an info message.
-2026-01-14 12:40:00,784 | WARNING | [tests.py -> test_logging():14]		This is a warning message.
-2026-01-14 12:40:00,784 | ERROR | [tests.py -> test_logging():15]		This is an error message.

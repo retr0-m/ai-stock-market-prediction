@@ -1,7 +1,16 @@
 import json
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
+import logs.log as log
 
-client = OpenAI()
+log.configure_logger(log_file="logs/outputs/chatgpt.log")
+
+load_dotenv()
+CHATGPT_API_KEY = os.getenv("CHATGPT_API_KEY")
+
+client = OpenAI(api_key=CHATGPT_API_KEY)
+
 
 def generate_stock_scenarios(
     ticker: str,
@@ -9,6 +18,7 @@ def generate_stock_scenarios(
     horizon_days: int = 30,
     market: str = "US"
 ):
+    log.info("Generating stock scenarios using ChatGPT")
     """
     Uses ChatGPT to generate structured future price scenarios
     suitable for plotting.
@@ -63,15 +73,18 @@ def generate_stock_scenarios(
     }}
     }}
     """
-
-    response = client.chat.completions.create(
-        model="gpt-4.1",
-        messages=[
-            {"role": "system", "content": "You generate market scenario data for visualization."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.4
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4.1",
+            messages=[
+                {"role": "system", "content": "You generate market scenario data for visualization."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.4
+        )
+    except Exception as e:
+        log.error(f"Error generating stock scenarios: {e}")
+        raise e
 
     return json.loads(response.choices[0].message.content)
 

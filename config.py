@@ -1,0 +1,3 @@
+TITLES=[
+    "AAPL"
+]

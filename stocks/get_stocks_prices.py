@@ -1,28 +1,22 @@
 import yfinance as yf
+import logs.log as log
+
+log.configure_logger(log_file="logs/outputs/stocks.log")
+
 
 def get_current_price(ticker: str) -> float:
-    stock = yf.Ticker(ticker)
+    log.info(f"Fetching current price for ticker: {ticker}")
+    try:
+        stock = yf.Ticker(ticker)
+    except Exception as e:
+        log.error(f"Error fetching ticker data for {ticker}: {e}")
+        log.info("Retrying to get current price due to error previous.")
     price = stock.fast_info["last_price"]
+    log.info(f"Current price of AAPL: {float(price)}")
     return float(price)
 
-
-
-
-
-from models_interface.chatgpt import generate_stock_scenarios
-
-def get_stock_price_scenarios(
-    ticker: str,
-    horizon_days: int = 30,
-    market: str = "US"
-):
-    current_price = get_current_price(ticker)
-    scenarios_json = generate_stock_scenarios(
-        ticker=ticker,
-        current_price=current_price,
-        horizon_days=horizon_days,
-        market=market
-    )
-    return scenarios_json.py
-
-
+def get_historical_prices(ticker: str, period: str = "1mo", interval: str = "1d"):
+    log.info(f"Fetching historical prices for ticker: {ticker}, period: {period}, interval: {interval}")
+    stock = yf.Ticker(ticker)
+    hist = stock.history(period=period, interval=interval)
+    return hist['Close'].tolist()
