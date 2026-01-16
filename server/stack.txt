@@ -1,0 +1,4 @@
+FastAPI  → web framework
+Uvicorn  → ASGI server
+Jinja2  → HTML templates
+Vanilla JS / Chart.js / Plotly → frontend graphs

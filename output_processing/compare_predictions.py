@@ -1,11 +1,11 @@
 
 
 def from_all_stock_scenarios(
-        all_json_stock_scenarios: dict
+        stock_scenarios: dict
     ) -> dict:
     comparison_results = {}
 
-    for model_name, data in all_json_stock_scenarios.items():
+    for model_name, data in stock_scenarios.items():
         scenarios = data["scenarios"]
         model_comparison = {}
 

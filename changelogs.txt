@@ -1,3 +1,29 @@
+VERSION 1.1.0
+    - Added FastAPI + Uvicorn backend server architecture
+    - Introduced REST API endpoints for predictions and historical data
+    - Added modular API routing structure (/server/api/routes.py)
+    - Implemented JSON-safe model output parsing and repair (safe_parse_json)
+    - Integrated multi-model support (ChatGPT, Gemini, LLaVA / Ollama)
+    - Added robust LLaVA response extraction and cleanup logic
+    - Fixed invalid JSON outputs from AI models (trailing chars, truncation, wrapping)
+    - Ensured FastAPI-compatible JSON serialization (float normalization)
+    - Added frontend dashboard (HTML + JS) for scenario visualization
+    - Integrated Plotly-based interactive charts (past + future scenarios)
+    - Added separate historical price endpoint for cleaner API design
+    - Implemented async frontend data loading with parallel fetches
+    - Fixed date handling and time-series alignment issues in charts
+    - Improved logging system with per-module log files
+    - Unified prompt generation via prompt_template.txt + create_prompt.py
+    - Added defensive checks for empty / null prompts
+    - Improved error resilience across model wrappers
+    - Prepared backend APIs for Swift / iOS client compatibility
+
+VERSION 1.0.2
+    - multi-model created
+    - added create_prompt.py
+    - improved prompt_template.txt
+    - added past data with settings from config.py
+
 VERSION 1.0.1
     - created basic scripts
     - error handling for many scripts

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stock Scenario Preview</title>
+
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont;
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 20px;
+      }
+      
+      h1 {
+        margin-bottom: 10px;
+      }
+      
+      input,
+      button {
+        padding: 8px;
+        margin-right: 5px;
+        border-radius: 6px;
+        border: none;
+        font-size: 14px;
+      }
+      
+      input {
+        width: 100px;
+      }
+      
+      button {
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+      }
+      
+      button:hover {
+        background: #1d4ed8;
+      }
+      
+      #chart {
+        margin-top: 30px;
+        height: 500px;
+      }
+      
+      .meta {
+        margin-top: 10px;
+        opacity: 0.8;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📈 Stock Scenario Preview</h1>
+
+    <input id="ticker" value="AAPL" />
+    <button onclick="loadData()">Run Prediction</button>
+
+    <div class="meta" id="meta"></div>
+    <div id="chart"></div>
+
+    <script>
+      async function loadData() {
+        const ticker = document.getElementById('ticker').value.toUpperCase()
+      
+        try {
+          // Fetch both endpoints
+          const [historyRes, predictRes] = await Promise.all([
+            fetch(`/api/stocks/${ticker}/history?period=3mo&interval=1d`),
+            fetch(`/api/predict`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ticker: ticker,
+                horizon_days: 30,
+                market: 'US'
+              })
+            })
+          ])
+      
+          // Parse JSON
+          const historyData = await historyRes.json()
+          const predictionData = await predictRes.json()
+      
+          // Safe fallbacks
+          const pastPrices = historyData.prices || {}
+          const predictions = predictionData.predictions || {}
+      
+          // Pass everything to renderChart
+          renderChart(pastPrices, predictions, predictionData.ticker, predictionData.current_price, predictionData.horizon_days)
+        } catch (err) {
+          console.error('Error fetching data:', err)
+          document.getElementById('meta').innerText = 'Failed to load data'
+        }
+      }
+      
+      function renderChart(pastPrices, predictions, ticker, currentPrice, horizonDays) {
+        const traces = []
+      
+        // Past prices
+        const pastDates = Object.keys(pastPrices).map((d) => d.replace(' UTC', ':00Z').replace(' ', 'T'))
+        const pastValues = Object.values(pastPrices)
+      
+        traces.push({
+          x: pastDates,
+          y: pastValues,
+          mode: 'lines',
+          name: 'Past price',
+          line: { color: 'white', width: 2 }
+        })
+      
+        const lastDate = pastDates.length ? new Date(pastDates[pastDates.length - 1]) : new Date()
+      
+        // Future predictions
+        for (const [modelName, modelData] of Object.entries(predictions)) {
+          if (!modelData || !modelData.scenarios) continue
+      
+          for (const [scenarioName, s] of Object.entries(modelData.scenarios)) {
+            const futureDates = s.prices.map((_, i) => {
+              const d = new Date(lastDate)
+              d.setDate(d.getDate() + i + 1)
+              return d.toISOString().slice(0, 10)
+            })
+      
+            traces.push({
+              x: futureDates,
+              y: s.prices,
+              mode: 'lines',
+              name: `${modelName} – ${scenarioName} (${(s.confidence * 100).toFixed(0)}%)`,
+              line: { dash: scenarioName === 'base' ? 'solid' : 'dot' }
+            })
+          }
+        }
+      
+        const layout = {
+          title: `${ticker} – Past & Future Scenarios`,
+          paper_bgcolor: '#0f172a',
+          plot_bgcolor: '#0f172a',
+          font: { color: '#e5e7eb' },
+          xaxis: { title: 'Date', type: 'date' },
+          yaxis: { title: 'Price' },
+          legend: { orientation: 'h' }
+        }
+      
+        Plotly.newPlot('chart', traces, layout)
+      
+        document.getElementById('meta').innerText = `Current price: $${currentPrice} | Horizon: ${horizonDays} days`
+      }
+    </script>
+  </body>
+</html>

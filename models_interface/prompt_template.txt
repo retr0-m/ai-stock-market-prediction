@@ -4,26 +4,35 @@ Generate plausible future price scenarios for the stock below.
 This is NOT financial advice or a real prediction — it is a
 scenario-based projection for visualization purposes.
 
+STOCK METADATA
+--------------
 Stock ticker: {ticker}
 Market: {market}
 Current price: {current_price}
 Time horizon: {horizon_days} days
 
-Rules:
-- Output ONLY valid JSON
+RULES
+-----
+- Output ONLY valid JSON - Do NOT add any parentheses, punctuation, or explanations. Only a single JSON object."
 - Prices must be floats
-- Each scenario must have exactly {horizon_days} values
+- Each scenario must contain exactly {horizon_days} values
 - Ensure smooth daily transitions (no extreme jumps)
-- Bull, Base, Bear confidence must sum to 1.0
+- Bull, Base, Bear confidence values must sum to 1.0
 - Use realistic volatility based on market conditions and future events
 - Consider macroeconomic factors, sector trends, and company performance
 
-Output:
-- Give only the JSON object as described below, no introduction test, nothing, just the JSON.
+OUTPUT CONSTRAINTS
+------------------
+- Return ONLY the JSON object
+- No explanations
+- No markdown
+- No comments
+- No additional text
 
-JSON format:
+JSON SCHEMA
+-----------
 {{
-    "ticker": "...",
+    "ticker": "{ticker}",
     "currency": "...",
     "horizon_days": {horizon_days},
     "assumptions": {{
@@ -45,3 +54,7 @@ JSON format:
         }}
     }}
 }}
+
+PAST PRICES TO ANALYZE
+----------------------
+{past_prices}
